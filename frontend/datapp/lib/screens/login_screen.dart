@@ -87,7 +87,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
-                      'Welcome Back',
+                      'Welcome',  
                       style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
@@ -146,7 +146,7 @@ class _LoginScreenState extends State<LoginScreen> {
                               );
                             },
                       child: Text(
-                        'Create an account',
+                        'Create account',
                         style: TextStyle(color: Colors.blue.shade700),
                       ),
                     ),

@@ -40,6 +40,7 @@ class AuthService extends ChangeNotifier {
     _refreshToken = refresh;
   }
 
+  // Login
   Future<void> login(String username, String password) async {
     isLoading = true;
     notifyListeners();
@@ -62,6 +63,7 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Register
   Future<void> register(Map<String, dynamic> payload) async {
     isLoading = true;
     notifyListeners();
@@ -80,6 +82,7 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
   }
 
+  // Logout
   Future<void> logout() async {
     _accessToken = null;
     _refreshToken = null;
@@ -94,6 +97,7 @@ class AuthService extends ChangeNotifier {
   // Fetch current user info
   Future<void> fetchUserInfo() async {
     if (_accessToken == null) return;
+
     final res = await http.get(
       Uri.parse('$baseUrl/api/auth/me/'),
       headers: {'Authorization': 'Bearer $_accessToken'},
@@ -107,12 +111,14 @@ class AuthService extends ChangeNotifier {
     } else if (_refreshToken != null) {
       await _refreshAccessToken();
     } else {
-      logout();
+      await logout();
     }
   }
 
   // Refresh access token using refresh token
   Future<void> _refreshAccessToken() async {
+    if (_refreshToken == null) return;
+
     final res = await http.post(
       Uri.parse('$baseUrl/api/auth/refresh/'),
       headers: {'Content-Type': 'application/json'},
@@ -126,7 +132,7 @@ class AuthService extends ChangeNotifier {
       await prefs.setString('accessToken', _accessToken!);
       await fetchUserInfo();
     } else {
-      logout();
+      await logout();
     }
   }
 }

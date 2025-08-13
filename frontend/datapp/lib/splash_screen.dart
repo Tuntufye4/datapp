@@ -10,7 +10,7 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
+class _SplashScreenState extends State<SplashScreen>   
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _scaleAnimation;
@@ -23,7 +23,7 @@ class _SplashScreenState extends State<SplashScreen>
     // Animation Controller for 60 seconds
     _controller = AnimationController(
       vsync: this,  
-      duration: const Duration(seconds: 28),
+      duration: const Duration(seconds: 18),       
     );
 
     // Scale Animation (Zoom out)
@@ -69,11 +69,11 @@ class _SplashScreenState extends State<SplashScreen>
                   style: TextStyle(
                     fontSize: 45,
                     fontWeight: FontWeight.bold, // Bold text
-                    color: Colors.blue,
+                    color: Color.fromARGB(255, 2, 45, 80),
                   ),
                 ),
               ),
-            );
+            ); 
           },
         ),
       ),

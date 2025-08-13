@@ -20,6 +20,7 @@ class Case(models.Model):
     diagnosis = models.TextField(blank=True)
     symptoms = models.TextField(blank=True)
     address = models.TextField(blank=True)
+    district = models.TextField(blank=True)   
 
     def __str__(self):
         return f"{self.disease} - {self.patient_name or 'anon'}"

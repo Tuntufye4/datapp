@@ -25,12 +25,20 @@ class _HSOFormPageState extends State<HSOFormPage> {
     'surveillance_notes': '',
     'symptoms': '',
     'address': '',
+    'district': '',
   };
 
   bool _loading = false;
 
-  final List<String> sexes = ['Male', 'Female'];   
+  final List<String> sexes = ['Male', 'Female'];
   final List<String> diseases = ['Malaria', 'Typhoid', 'Cholera', 'Other'];
+  final List<String> districts = [
+    'Chitipa', 'Karonga', 'Rumphi', 'Mzimba', 'Nkhata Bay', 'Nkhatabay',
+    'Kasungu', 'Lilongwe', 'Dowa', 'Salima', 'Ntchisi', 'Nkhotakota',
+    'Mchinji', 'Dedza', 'Mangochi', 'Balaka', 'Machinga', 'Zomba',
+    'Blantyre', 'Thyolo', 'Mulanje', 'Phalombe', 'Chiradzulu', 'Nsanje',
+    'Chikwawa', 'Neno', 'Other'
+  ];
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
@@ -60,7 +68,8 @@ class _HSOFormPageState extends State<HSOFormPage> {
     setState(() => _loading = false);
   }
 
-  Widget _buildTextField(String label, {int maxLines = 1, TextInputType? type}) {
+  Widget _buildTextField(String label,
+      {int maxLines = 1, TextInputType? type}) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 12),
       child: TextFormField(
@@ -123,6 +132,22 @@ class _HSOFormPageState extends State<HSOFormPage> {
             ),
             const SizedBox(height: 12),
 
+            // District Dropdown
+            DropdownButtonFormField<String>(
+              value: formData['district'].isEmpty ? null : formData['district'],
+              items: districts
+                  .map((d) => DropdownMenuItem(value: d, child: Text(d)))
+                  .toList(),
+              onChanged: (v) => setState(() => formData['district'] = v ?? ''),
+              decoration: InputDecoration(
+                labelText: 'District',
+                border:
+                    OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              validator: (v) => v == null || v.isEmpty ? 'Select district' : null,
+            ),
+            const SizedBox(height: 12),
+
             // Disease Dropdown
             DropdownButtonFormField<String>(
               value: formData['disease'].isEmpty ? null : formData['disease'],
@@ -172,4 +197,4 @@ class _HSOFormPageState extends State<HSOFormPage> {
     );
   }
 }
-      
+              

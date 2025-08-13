@@ -22,16 +22,24 @@ class _ClinicalFormPageState extends State<ClinicalFormPage> {
     'latitude': '',
     'longitude': '',
     'treatment': '',
-    'diagnosis': '',   
+    'diagnosis': '',
     'surveillance_notes': '',
     'symptoms': '',
     'address': '',
+    'district': '',
   };
 
-  bool _loading = false;   
+  bool _loading = false;
 
   final List<String> sexes = ['Male', 'Female'];
   final List<String> diseases = ['Malaria', 'Typhoid', 'Cholera', 'Other'];
+  final List<String> districts = [
+    'Chitipa', 'Karonga', 'Rumphi', 'Mzimba', 'Nkhata Bay', 'Nkhatabay',
+    'Kasungu', 'Lilongwe', 'Dowa', 'Salima', 'Ntchisi', 'Nkhotakota',
+    'Mchinji', 'Dedza', 'Mangochi', 'Balaka', 'Machinga', 'Zomba',
+    'Blantyre', 'Thyolo', 'Mulanje', 'Phalombe', 'Chiradzulu', 'Nsanje',
+    'Chikwawa', 'Neno', 'Other'
+  ];
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
@@ -63,6 +71,33 @@ class _ClinicalFormPageState extends State<ClinicalFormPage> {
     setState(() => _loading = false);
   }
 
+  Widget _buildTextField(String label,
+      {int maxLines = 1, TextInputType? type}) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 12),
+      child: TextFormField(
+        decoration: InputDecoration(
+          labelText: label,
+          border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+        ),
+        maxLines: maxLines,
+        keyboardType: type ?? TextInputType.text,
+        validator: (v) =>
+            (v == null || v.isEmpty) && label != 'Notes' ? 'Enter $label' : null,
+        onSaved: (v) {
+          String key = label.toLowerCase().replaceAll(' ', '_');
+          if (key == 'latitude' || key == 'longitude') {
+            formData[key] = double.tryParse(v ?? '') ?? 0;
+          } else if (key == 'age') {
+            formData[key] = int.tryParse(v ?? '') ?? 0;
+          } else {
+            formData[key] = v ?? '';
+          }
+        },
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -81,28 +116,8 @@ class _ClinicalFormPageState extends State<ClinicalFormPage> {
             ),
             const SizedBox(height: 20),
 
-            // Patient Name
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: 'Patient Name',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-              ),
-              validator: (v) => v == null || v.isEmpty ? 'Enter patient name' : null,
-              onSaved: (v) => formData['patient_name'] = v ?? '',
-            ),
-            const SizedBox(height: 12),
-
-            // Age
-            TextFormField(
-              decoration: InputDecoration(
-                labelText: 'Age',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-              ),
-              keyboardType: TextInputType.number,
-              validator: (v) => v == null || v.isEmpty ? 'Enter age' : null,
-              onSaved: (v) => formData['age'] = int.tryParse(v ?? '') ?? 0,
-            ),
-            const SizedBox(height: 12),
+            _buildTextField('Patient Name'),
+            _buildTextField('Age', type: TextInputType.number),
 
             // Sex Dropdown
             DropdownButtonFormField<String>(
@@ -116,6 +131,21 @@ class _ClinicalFormPageState extends State<ClinicalFormPage> {
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
               ),
               validator: (v) => v == null || v.isEmpty ? 'Select sex' : null,
+            ),
+            const SizedBox(height: 12),
+
+            // District Dropdown
+            DropdownButtonFormField<String>(
+              value: formData['district'].isEmpty ? null : formData['district'],
+              items: districts
+                  .map((d) => DropdownMenuItem(value: d, child: Text(d)))
+                  .toList(),
+              onChanged: (v) => setState(() => formData['district'] = v ?? ''),
+              decoration: InputDecoration(
+                labelText: 'District',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              validator: (v) => v == null || v.isEmpty ? 'Select district' : null,
             ),
             const SizedBox(height: 12),
 
@@ -136,24 +166,10 @@ class _ClinicalFormPageState extends State<ClinicalFormPage> {
 
             // Other Text Fields
             ...['Diagnosis', 'Treatment', 'Notes', 'Symptoms', 'Surveillance Notes', 'Address', 'Latitude', 'Longitude'].map((field) {
-              return Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: TextFormField(
-                  decoration: InputDecoration(
-                    labelText: field,
-                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
-                  ),
-                  keyboardType: (field == 'Latitude' || field == 'Longitude') ? TextInputType.number : TextInputType.text,
-                  maxLines: (field == 'Notes' || field == 'Symptoms' || field == 'Surveillance Notes' || field == 'Address') ? 3 : 1,
-                  onSaved: (v) {
-                    String key = field.toLowerCase().replaceAll(' ', '_');
-                    if (key == 'latitude' || key == 'longitude') {
-                      formData[key] = double.tryParse(v ?? '') ?? 0;
-                    } else {
-                      formData[key] = v ?? '';
-                    }
-                  },
-                ),
+              return _buildTextField(
+                field,
+                maxLines: (field == 'Notes' || field == 'Symptoms' || field == 'Surveillance Notes' || field == 'Address') ? 3 : 1,
+                type: (field == 'Latitude' || field == 'Longitude') ? TextInputType.number : TextInputType.text,
               );
             }),
 
@@ -178,4 +194,4 @@ class _ClinicalFormPageState extends State<ClinicalFormPage> {
     );
   }
 }
-    
+               

@@ -23,8 +23,10 @@ class _TableScreenState extends State<TableScreen> {
 
   Future<void> loadCases() async {
     final auth = Provider.of<AuthService>(context, listen: false);
-    final res = await http.get(Uri.parse('${auth.baseUrl}/api/chw_cases/'),     
-        headers: {'Authorization': 'Bearer ${auth.token}'});
+    final res = await http.get(
+      Uri.parse('${auth.baseUrl}/api/chw_cases/'),
+      headers: {'Authorization': 'Bearer ${auth.token}'},
+    );
     if (res.statusCode == 200) {
       setState(() {
         rows = jsonDecode(res.body);
@@ -42,25 +44,46 @@ class _TableScreenState extends State<TableScreen> {
   Widget build(BuildContext context) {
     if (_loading) return const Center(child: CircularProgressIndicator());
     if (rows.isEmpty) return const Center(child: Text('No records'));
+
+    final columns = rows.first.keys.toList();
+
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: DataTable(
-        columns: const [
-          DataColumn(label: Text('ID')),
-          DataColumn(label: Text('Patient')),
-          DataColumn(label: Text('Disease')),
-          DataColumn(label: Text('Date')),
-        ],
-        rows: rows
-            .map((r) => DataRow(cells: [
-                  DataCell(Text(r['id'].toString())),
-                  DataCell(Text(r['patient_name'] ?? '')),
-                  DataCell(Text(r['disease'] ?? '')),
-                  DataCell(Text(r['created_at'] ?? '')),
-                ]))
+        headingRowColor: MaterialStateProperty.all(Colors.blue.shade100),
+        dataRowColor: MaterialStateProperty.resolveWith<Color?>(
+          (states) => states.contains(MaterialState.selected)
+              ? Colors.blue.shade50
+              : null,
+        ),
+        columnSpacing: 20,
+        columns: columns
+            .map(
+              (col) => DataColumn(
+                label: Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 8),
+                  child: Text(
+                    col.toString().toUpperCase(),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold, color: Colors.black87),
+                  ),
+                ),
+              ),
+            )
             .toList(),
+        rows: List.generate(rows.length, (index) {
+          final row = rows[index];
+          final isEven = index % 2 == 0;
+          return DataRow(
+            color: MaterialStateProperty.all(
+                isEven ? Colors.grey.shade100 : Colors.white),
+            cells: columns
+                .map((col) => DataCell(Text(row[col]?.toString() ?? '')))
+                .toList(),
+          );
+        }),
       ),
     );
   }
 }
-        
+      
