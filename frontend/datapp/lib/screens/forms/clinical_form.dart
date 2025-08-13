@@ -1,0 +1,181 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import '../../services/auth_service.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
+class ClinicalFormPage extends StatefulWidget {
+  const ClinicalFormPage({super.key});
+
+  @override
+  State<ClinicalFormPage> createState() => _ClinicalFormPageState();
+}
+
+class _ClinicalFormPageState extends State<ClinicalFormPage> {
+  final _formKey = GlobalKey<FormState>();
+  final Map<String, dynamic> formData = {
+    'patient_name': '',
+    'age': '',
+    'sex': '',
+    'disease': '',
+    'notes': '',
+    'latitude': '',
+    'longitude': '',
+    'treatment': '',
+    'diagnosis': '',   
+    'surveillance_notes': '',
+    'symptoms': '',
+    'address': '',
+  };
+
+  bool _loading = false;   
+
+  final List<String> sexes = ['Male', 'Female'];
+  final List<String> diseases = ['Malaria', 'Typhoid', 'Cholera', 'Other'];
+
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
+    _formKey.currentState!.save();
+
+    final auth = Provider.of<AuthService>(context, listen: false);
+    setState(() => _loading = true);
+
+    final url = Uri.parse('${auth.baseUrl}/api/clinical_cases/');
+    final res = await http.post(
+      url,
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ${auth.token}',
+      },
+      body: jsonEncode(formData),
+    );
+
+    if (res.statusCode == 201) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Clinical Case submitted successfully')),
+      );
+      _formKey.currentState!.reset();
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to submit: ${res.body}')),
+      );
+    }
+    setState(() => _loading = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(16),
+      child: Form(
+        key: _formKey,
+        child: ListView(
+          children: [
+            Text(
+              'Clinical Case Form',
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    fontWeight: FontWeight.bold,
+                    color: Colors.blue.shade800,
+                  ),
+              textAlign: TextAlign.center,
+            ),
+            const SizedBox(height: 20),
+
+            // Patient Name
+            TextFormField(
+              decoration: InputDecoration(
+                labelText: 'Patient Name',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              validator: (v) => v == null || v.isEmpty ? 'Enter patient name' : null,
+              onSaved: (v) => formData['patient_name'] = v ?? '',
+            ),
+            const SizedBox(height: 12),
+
+            // Age
+            TextFormField(
+              decoration: InputDecoration(
+                labelText: 'Age',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              keyboardType: TextInputType.number,
+              validator: (v) => v == null || v.isEmpty ? 'Enter age' : null,
+              onSaved: (v) => formData['age'] = int.tryParse(v ?? '') ?? 0,
+            ),
+            const SizedBox(height: 12),
+
+            // Sex Dropdown
+            DropdownButtonFormField<String>(
+              value: formData['sex'].isEmpty ? null : formData['sex'],
+              items: sexes
+                  .map((s) => DropdownMenuItem(value: s, child: Text(s)))
+                  .toList(),
+              onChanged: (v) => setState(() => formData['sex'] = v ?? ''),
+              decoration: InputDecoration(
+                labelText: 'Sex',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              validator: (v) => v == null || v.isEmpty ? 'Select sex' : null,
+            ),
+            const SizedBox(height: 12),
+
+            // Disease Dropdown
+            DropdownButtonFormField<String>(
+              value: formData['disease'].isEmpty ? null : formData['disease'],
+              items: diseases
+                  .map((d) => DropdownMenuItem(value: d, child: Text(d)))
+                  .toList(),
+              onChanged: (v) => setState(() => formData['disease'] = v ?? ''),
+              decoration: InputDecoration(
+                labelText: 'Disease',
+                border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              validator: (v) => v == null || v.isEmpty ? 'Select disease' : null,
+            ),
+            const SizedBox(height: 12),
+
+            // Other Text Fields
+            ...['Diagnosis', 'Treatment', 'Notes', 'Symptoms', 'Surveillance Notes', 'Address', 'Latitude', 'Longitude'].map((field) {
+              return Padding(
+                padding: const EdgeInsets.only(bottom: 12),
+                child: TextFormField(
+                  decoration: InputDecoration(
+                    labelText: field,
+                    border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                  ),
+                  keyboardType: (field == 'Latitude' || field == 'Longitude') ? TextInputType.number : TextInputType.text,
+                  maxLines: (field == 'Notes' || field == 'Symptoms' || field == 'Surveillance Notes' || field == 'Address') ? 3 : 1,
+                  onSaved: (v) {
+                    String key = field.toLowerCase().replaceAll(' ', '_');
+                    if (key == 'latitude' || key == 'longitude') {
+                      formData[key] = double.tryParse(v ?? '') ?? 0;
+                    } else {
+                      formData[key] = v ?? '';
+                    }
+                  },
+                ),
+              );
+            }),
+
+            const SizedBox(height: 20),
+            ElevatedButton(
+              onPressed: _loading ? null : _submit,
+              style: ElevatedButton.styleFrom(
+                padding: const EdgeInsets.symmetric(vertical: 14),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+              ),
+              child: _loading
+                  ? const SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
+                    )
+                  : const Text('Submit Clinical Case', style: TextStyle(fontSize: 16)),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+    
