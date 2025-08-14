@@ -12,7 +12,7 @@ class TableScreen extends StatefulWidget {
 }
 
 class _TableScreenState extends State<TableScreen> {
-  List<dynamic> rows = [];
+  List<Map<String, dynamic>> rows = [];
   bool _loading = true;
 
   @override
@@ -28,10 +28,18 @@ class _TableScreenState extends State<TableScreen> {
       headers: {'Authorization': 'Bearer ${auth.token}'},
     );
     if (res.statusCode == 200) {
-      setState(() {
-        rows = jsonDecode(res.body);
-        _loading = false;
-      });
+      final data = jsonDecode(res.body);
+      if (data is List) {
+        setState(() {
+          rows = List<Map<String, dynamic>>.from(data);
+          _loading = false;
+        });
+      } else {
+        setState(() {
+          rows = [];
+          _loading = false;
+        });
+      }
     } else {
       setState(() {
         rows = [];
@@ -43,33 +51,34 @@ class _TableScreenState extends State<TableScreen> {
   @override
   Widget build(BuildContext context) {
     if (_loading) return const Center(child: CircularProgressIndicator());
-    if (rows.isEmpty) return const Center(child: Text('No records'));
+    if (rows.isEmpty) return const Center(child: Text('No records found'));
 
-    final columns = rows.first.keys.toList();
+    // Ensure all keys are strings
+    final columns = rows.first.keys.map((k) => k.toString()).toList();
 
     return SingleChildScrollView(
       scrollDirection: Axis.horizontal,
       child: DataTable(
-        headingRowColor: MaterialStateProperty.all(Colors.blue.shade100),
+        headingRowColor: MaterialStateProperty.all(Colors.blue.shade200),
         dataRowColor: MaterialStateProperty.resolveWith<Color?>(
           (states) => states.contains(MaterialState.selected)
               ? Colors.blue.shade50
               : null,
         ),
         columnSpacing: 20,
+        headingTextStyle: const TextStyle(
+            fontWeight: FontWeight.bold, color: Colors.black87),
         columns: columns
-            .map(
-              (col) => DataColumn(
-                label: Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8),
-                  child: Text(
-                    col.toString().toUpperCase(),
-                    style: const TextStyle(
-                        fontWeight: FontWeight.bold, color: Colors.black87),
+            .map((col) => DataColumn(
+                  label: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 8),
+                    child: Text(
+                      col.toUpperCase(),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, color: Colors.black87),
+                    ),
                   ),
-                ),
-              ),
-            )
+                ))
             .toList(),
         rows: List.generate(rows.length, (index) {
           final row = rows[index];
@@ -86,4 +95,4 @@ class _TableScreenState extends State<TableScreen> {
     );
   }
 }
-      
+       
