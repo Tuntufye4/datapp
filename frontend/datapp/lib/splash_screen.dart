@@ -20,10 +20,10 @@ class _SplashScreenState extends State<SplashScreen>
   void initState() {
     super.initState();
 
-    // Animation Controller for 60 seconds
+    // Animation Controller for 14 seconds
     _controller = AnimationController(
       vsync: this,  
-      duration: const Duration(seconds: 18),       
+      duration: const Duration(seconds: 14),                
     );
 
     // Scale Animation (Zoom out)

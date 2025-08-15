@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../services/auth_service.dart';
+import '../services/auth_service.dart';  
 import 'login_screen.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -71,7 +71,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
       appBar: AppBar(
         title: const Text('Register'),
         centerTitle: true,
-        backgroundColor: Colors.blue.shade700,
+        backgroundColor:const Color.fromARGB(255, 68, 236, 138),
         elevation: 0,
       ),
       body: Center(
@@ -93,7 +93,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                       style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Colors.blue.shade700),
+                          color: const Color.fromARGB(255, 1, 3, 5)),
                     ),
                     const SizedBox(height: 20),
                     TextFormField(
@@ -121,7 +121,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     TextFormField(
                       decoration: _inputDecoration('Last name'),
                       validator: (v) =>
-                          v == null || v.isEmpty ? 'Enter last name' : null,
+                          v == null || v.isEmpty ? 'Enter last name' : null,  
                       onSaved: (v) => data['last_name'] = v ?? '',
                     ),
                     const SizedBox(height: 16),
@@ -157,7 +157,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),
-                          backgroundColor: Colors.blue.shade700,
+                          backgroundColor: const Color.fromARGB(255, 68, 236, 138),
                         ),
                         child: _loading
                             ? const SizedBox(
@@ -187,7 +187,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                             },
                       child: Text(
                         'Already have an account? Login',
-                        style: TextStyle(color: Colors.blue.shade700),
+                        style: TextStyle(color: const Color.fromARGB(255, 2, 3, 5)),
                       ),
                     ),
                   ],

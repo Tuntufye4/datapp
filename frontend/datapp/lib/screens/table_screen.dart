@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import '../services/auth_service.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
+      
 class TableScreen extends StatefulWidget {
   const TableScreen({super.key});
 
@@ -50,49 +50,82 @@ class _TableScreenState extends State<TableScreen> {
 
   @override
   Widget build(BuildContext context) {
-    if (_loading) return const Center(child: CircularProgressIndicator());
-    if (rows.isEmpty) return const Center(child: Text('No records found'));
-
-    // Ensure all keys are strings
-    final columns = rows.first.keys.map((k) => k.toString()).toList();
-
-    return SingleChildScrollView(
-      scrollDirection: Axis.horizontal,
-      child: DataTable(
-        headingRowColor: MaterialStateProperty.all(Colors.blue.shade200),
-        dataRowColor: MaterialStateProperty.resolveWith<Color?>(
-          (states) => states.contains(MaterialState.selected)
-              ? Colors.blue.shade50
-              : null,
-        ),
-        columnSpacing: 20,
-        headingTextStyle: const TextStyle(
-            fontWeight: FontWeight.bold, color: Colors.black87),
-        columns: columns
-            .map((col) => DataColumn(
-                  label: Padding(
-                    padding: const EdgeInsets.symmetric(vertical: 8),
-                    child: Text(
-                      col.toUpperCase(),
-                      style: const TextStyle(
-                          fontWeight: FontWeight.bold, color: Colors.black87),
+    return Scaffold(
+      appBar: AppBar(   
+        backgroundColor: Colors.white,
+        centerTitle: true,
+        iconTheme: const IconThemeData(color: Colors.black),
+        elevation: 1,
+      ),
+      body: _loading
+          ? const Center(child: CircularProgressIndicator())
+          : rows.isEmpty
+              ? const Center(child: Text('No records found'))
+              : Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Card(
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.all(12.0),
+                      child: SizedBox(
+                        height: MediaQuery.of(context).size.height * 0.7,
+                        child: Scrollbar(
+                          thumbVisibility: true,      
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.vertical,
+                            child: SingleChildScrollView(
+                              scrollDirection: Axis.horizontal,
+                              child: DataTable(
+                                headingRowColor:
+                                    MaterialStateProperty.all(Color.fromARGB(255, 68, 236, 138)),
+                                dataRowColor:
+                                    MaterialStateProperty.resolveWith<Color?>(
+                                  (states) => states.contains(MaterialState.selected)
+                                      ? Colors.blue.shade50
+                                      : null,
+                                ),
+                                columnSpacing: 20,
+                                headingTextStyle: const TextStyle(
+                                    fontWeight: FontWeight.bold,
+                                    color: Colors.black87),
+                                columns: rows.first.keys
+                                    .map((col) => DataColumn(
+                                          label: Padding(
+                                            padding: const EdgeInsets.symmetric(
+                                                vertical: 8),
+                                            child: Text(
+                                              col.toUpperCase(),
+                                              style: const TextStyle(
+                                                  fontWeight: FontWeight.bold,
+                                                  color: Colors.black87),
+                                            ),
+                                          ),
+                                        ))
+                                    .toList(),
+                                rows: List.generate(rows.length, (index) {
+                                  final row = rows[index];
+                                  final isEven = index % 2 == 0;
+                                  return DataRow(
+                                    color: MaterialStateProperty.all(
+                                        isEven ? Colors.grey.shade100 : Colors.white),
+                                    cells: rows.first.keys
+                                        .map((col) => DataCell(
+                                            Text(row[col]?.toString() ?? '')))
+                                        .toList(),
+                                  );
+                                }),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                     ),
                   ),
-                ))
-            .toList(),
-        rows: List.generate(rows.length, (index) {
-          final row = rows[index];
-          final isEven = index % 2 == 0;
-          return DataRow(
-            color: MaterialStateProperty.all(
-                isEven ? Colors.grey.shade100 : Colors.white),
-            cells: columns
-                .map((col) => DataCell(Text(row[col]?.toString() ?? '')))
-                .toList(),
-          );
-        }),
-      ),
+                ),
     );
   }
 }
-       
+      

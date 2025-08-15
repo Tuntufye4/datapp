@@ -56,20 +56,20 @@ class _LoginScreenState extends State<LoginScreen> {
       ),
       focusedBorder: OutlineInputBorder(
         borderRadius: BorderRadius.circular(10),
-        borderSide: const BorderSide(color: Colors.blue, width: 2),
+        borderSide: const BorderSide(color: Color.fromARGB(255, 68, 236, 138), width: 2),
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
     );
   }
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context) {    
     return Scaffold(
       backgroundColor: Colors.blue.shade50,
       appBar: AppBar(
         title: const Text('Login'),
         centerTitle: true,
-        backgroundColor: Colors.blue.shade700,
+        backgroundColor:const Color.fromARGB(255, 68, 236, 138),
         elevation: 0,
       ),
       body: Center(
@@ -91,7 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       style: TextStyle(
                           fontSize: 24,
                           fontWeight: FontWeight.bold,
-                          color: Colors.blue.shade700),
+                          color: const Color.fromARGB(0, 238, 65, 65)),
                     ),
                     const SizedBox(height: 20),
                     TextFormField(
@@ -117,7 +117,7 @@ class _LoginScreenState extends State<LoginScreen> {
                           padding: const EdgeInsets.symmetric(vertical: 14),
                           shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12)),
-                          backgroundColor: Colors.blue.shade700,
+                          backgroundColor:  const Color.fromARGB(255, 68, 236, 138),
                         ),
                         child: _loading
                             ? const SizedBox(
@@ -147,7 +147,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             },
                       child: Text(
                         'Create account',
-                        style: TextStyle(color: Colors.blue.shade700),
+                        style: TextStyle(color: const Color.fromARGB(255, 0, 1, 2)),
                       ),
                     ),
                   ],

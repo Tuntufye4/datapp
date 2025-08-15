@@ -10,7 +10,7 @@ import 'chart_screen.dart';
 import 'table_screen.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  const HomeScreen({super.key});    
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -18,6 +18,12 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _idx = 0;
+
+  void _logout(BuildContext context) {
+    final auth = Provider.of<AuthService>(context, listen: false);
+    auth.logout(); // Clear token and user info
+    Navigator.of(context).pushReplacementNamed('/login'); // Navigate to login page
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -32,8 +38,8 @@ class _HomeScreenState extends State<HomeScreen> {
         ClinicalFormPage()
       else
         HSOFormPage(token: token),
-      ChartScreen(),
-      TableScreen(),
+      const ChartScreen(),
+      const TableScreen(),
     ];
 
     return Scaffold(
@@ -42,7 +48,7 @@ class _HomeScreenState extends State<HomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.logout),
-            onPressed: () => auth.logout(),
+            onPressed: () => _logout(context),
             tooltip: 'Logout',
           ),
         ],
@@ -54,7 +60,7 @@ class _HomeScreenState extends State<HomeScreen> {
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.edit), label: 'Form'),
           BottomNavigationBarItem(icon: Icon(Icons.bar_chart), label: 'Charts'),
-          BottomNavigationBarItem(icon: Icon(Icons.table_chart), label: 'Table'),
+          BottomNavigationBarItem(icon: Icon(Icons.table_chart), label: 'Table'),   
         ],
       ),
     );
